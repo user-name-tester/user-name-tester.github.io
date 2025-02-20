@@ -1,0 +1,309 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Presentación Interactiva</title>
+  <style>
+
+    body {
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #000000;
+      transition: background-color 0.3s ease-in-out; /* Transición suave en 2 segundos */
+      height: 100vh;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    img, video, .start-screen, button{
+      max-width: 100%;
+      max-height: 100%;
+      position: absolute;
+      z-index: 0;
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+
+    img.active, video.active, .start-screen.active, .button.active{
+      z-index: 1;
+      opacity: 1;
+    }
+
+    .start-screen {
+      cursor: pointer;
+      color: white;
+      text-align: center;
+      background-image: url(./Images/Bienvenida.webp);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      padding: 250px;
+    }
+
+    .start-screen h1 {
+      font-size: 2rem;
+      margin: 1rem;
+    }
+
+    /* 🎵 Estilos para el visualizador de audio */
+    #audio-visualizer {
+      position: absolute;
+      bottom: 115px; /* Separación del borde */
+      left: 50%;
+      transform: translateX(-50%); /* Centrar */
+      width: 80%; /* Ancho ajustado */
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      z-index: 2; /* 🔹 Ahora está por delante de "End.png" */
+    }
+
+    .bar {
+      width: 10px;
+      height: 50px;
+      background: linear-gradient(#64e6e6, #9fe591);
+      margin: 0 5px;
+      border-radius: 5px;
+      transition: height 0.1s;
+      opacity: 0.8; /* 🔹 Un poco de transparencia */
+    }
+
+
+      /* 🔹 Estilos del botón */
+  #go-to-end {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 15px;
+  }
+
+  #go-to-end:hover {
+    background-color: #cc0000;
+    color: white;
+  }
+
+  </style>
+</head>
+
+<body>
+
+<!-- 🔹 Botón para ir al final -->
+<button class="button active" id="go-to-end">Ir al Final</button>
+
+<script>
+  // 🔹 Función para ir directamente a la pantalla final
+  document.getElementById("go-to-end").onclick = () => {
+    showContent(content.length - 1); // Salta a "End.png"
+  };
+</script>
+
+
+  <!-- Pantalla de inicio -->
+  <div class="start-screen active" id="start-screen">
+    <h1>Haz clic para iniciar la presentación</h1>
+  </div>
+
+  <!-- Contenedor de video -->
+  <video id="video" autoplay muted></video>
+
+  <!-- Contenedor de imagen -->
+  <img id="image" alt="Diapositiva">
+
+  <!-- 🎵 Contenedor del visualizador de audio -->
+  <div id="audio-visualizer"></div>
+
+  <!-- 🎵 Elemento de audio -->
+  <audio id="background-music" src="Music/end_music.mp3"></audio>
+
+  <script>
+    // Lista de contenido
+    const content = [
+      { type: 'video', src: 'Videos/intro.mp4' },
+      { type: 'tempimage', src: 'Images/whitetest.png' },
+      { type: 'image', src: 'Images/slide1.png' },
+      { type: 'video', src: 'Videos/Trans1.mp4' },
+      { type: 'image', src: 'Images/slide2.png' },
+      { type: 'video', src: 'Videos/Trans2.mp4' },
+      { type: 'image', src: 'Images/slide3.png' },
+      { type: 'video', src: 'Videos/Trans3.mp4' },
+      { type: 'image', src: 'Images/slide4.png' },
+      { type: 'video', src: 'Videos/Trans4.mp4' },
+      { type: 'image', src: 'Images/slide5.png' },
+      { type: 'video', src: 'Videos/Trans5.mp4' },
+      { type: 'image', src: 'Images/slide6.png' },
+      { type: 'video', src: 'Videos/Trans6.mp4' },
+      { type: 'image', src: 'Images/slide7.png' },
+      { type: 'video', src: 'Videos/Trans7.mp4' },
+      { type: 'image', src: 'Images/slide8.png' },
+      { type: 'video', src: 'Videos/Trans8.mp4' },
+      { type: 'image', src: 'Images/slide9.png' },
+      { type: 'video', src: 'Videos/Trans9.mp4' },
+      { type: 'image', src: 'Images/slide10.png' },
+      { type: 'video', src: 'Videos/Trans10.mp4' },
+      { type: 'image', src: 'Images/slide11.png' },
+      { type: 'video', src: 'Videos/Trans11.mp4' },
+      { type: 'image', src: 'Images/slide12.png' },
+      { type: 'video', src: 'Videos/Trans12.mp4' },
+      { type: 'image', src: 'Images/slide13.png' },
+      { type: 'video', src: 'Videos/Trans13.mp4' },
+      { type: 'Endimage', src: 'Images/End.png' },
+    ];
+
+    let currentIndex = 0;
+    const startScreen = document.getElementById('start-screen');
+    const video = document.getElementById('video');
+    const image = document.getElementById('image');
+    const body = document.body;
+    const audio = document.getElementById('background-music');
+    const visualizer = document.getElementById('audio-visualizer');
+    const button = document.getElementById('go-to-end')
+
+    // Precarga de imágenes para evitar parpadeos
+    function preloadImage(src) {
+      const img = new Image();
+      img.src = src;
+    }
+
+    content.forEach((item) => {
+      if (item.type === 'image' || item.type === 'Endimage') preloadImage(item.src);
+    });
+
+    function showContent(index) {
+      if (index >= content.length) return;
+
+      currentIndex = index;
+      const item = content[index];
+
+      if (item.type === 'video') {
+        video.src = item.src;
+        video.classList.add('active');
+        video.oncanplay = () => {
+          video.play();
+        };
+
+        video.onended = () => {
+          setTimeout(() => {
+            video.classList.remove('active');
+            showContent(index + 1);
+          }, 300);
+        };
+      } else if (item.type === 'tempimage') {
+        image.src = item.src;
+        image.classList.add('active');
+        setTimeout(() => {
+          image.classList.remove('active');
+          showContent(index + 1);
+        }, 100);
+      } else if (item.type === 'image' || item.type === 'Endimage') {
+        image.src = item.src;
+        image.classList.add('active');
+
+        if (item.type === 'Endimage') {
+          startEndScreen();
+          return;
+        }
+
+        image.onclick = () => {
+          image.onclick = null;
+          image.classList.remove('active');
+          showContent(index + 1);
+        };
+      }
+    }
+
+
+  // 🔹 Función para ir a la diapositiva anterior
+  function goBack() {
+    if (currentIndex > 0) {
+      let newIndex = currentIndex - 1;
+
+      // 🔹 Si el contenido anterior es un video, se reproduce de nuevo
+      if (content[newIndex].type === "video") {
+        showContent(newIndex);
+      }
+      // 🔹 Si es una tempimage, saltarla y retroceder más
+      else {
+        while (newIndex > 0 && content[newIndex].type === "tempimage") {
+          newIndex--;
+        }
+        showContent(newIndex);
+      }
+    }
+  }
+
+  // 🔹 Hacer clic derecho para retroceder
+  document.addEventListener("contextmenu", (event) => {
+    event.preventDefault(); // 🔹 Evita el menú contextual
+    goBack(); // 🔹 Llama a la función de retroceso
+  });
+
+
+
+    function startEndScreen() {
+      audio.play();
+      visualizer.style.visibility = "visible";
+      setupAudioVisualizer();
+    }
+
+    function setupAudioVisualizer() {
+  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const analyser = audioContext.createAnalyser();
+  const source = audioContext.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioContext.destination);
+
+  analyser.fftSize = 64; // 🔹 Reduce el tamaño del FFT para captar más bajos
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  // Crear barras en el visualizador
+  visualizer.innerHTML = ""; // 🔹 Borra barras anteriores si existían
+  for (let i = 1; i < bufferLength / 2.5; i++) { // 🔹 Menos barras, más anchas
+    const bar = document.createElement("div");
+    bar.classList.add("bar");
+    visualizer.appendChild(bar);
+  }
+
+  function animate() {
+    analyser.getByteFrequencyData(dataArray);
+    const bars = document.querySelectorAll(".bar");
+
+    bars.forEach((bar, index) => {
+      const height = ((dataArray[index] / 255) ** 2.5) * 120; // 🔹 Más sensibilidad y altura máxima aumentada
+      bar.style.height = `${height}px`;
+    });
+
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+    startScreen.onclick = () => {
+      startScreen.classList.remove('active');
+      button.classList.remove("active");
+      document.body.style.cursor = 'none';
+      setTimeout(() => {
+        body.style.backgroundColor = '#ffffff';
+      }, 1500);
+
+      showContent(currentIndex);
+    };
+
+  </script>
+</body>
+</html>
