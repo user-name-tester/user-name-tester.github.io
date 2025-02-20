@@ -250,57 +250,58 @@
   animate();
 }
 
-// Logica de transiciones
 function showContent(index) {
     if (index >= content.length) return;
 
     currentIndex = index;
     const item = content[index];
 
-    // 🔹 Asegurar que todas las imágenes están ocultas antes de mostrar una nueva
+    // 🔹 OCULTAR TODAS LAS IMÁGENES ANTES DE MOSTRAR UNA NUEVA
     image.classList.remove('active');
+    video.classList.remove('active');
 
     if (item.type === 'video') {
-      // 🔹 Reproducir el video y asegurarnos de que la imagen no aparezca antes de tiempo
-      video.src = item.src;
-      video.classList.add('active');
+        video.src = item.src;
+        video.classList.add('active');
 
-      video.oncanplay = () => {
-        video.play();
-      };
+        video.oncanplay = () => {
+            video.play();
+        };
 
-      video.onended = () => {
-        video.classList.remove('active');
+        video.onended = () => {
+            video.classList.remove('active');
 
-        // 🔹 Al terminar el video, mostrar la siguiente imagen inmediatamente sin parpadeo
-        const nextItem = content[index + 1];
-        if (nextItem && nextItem.type === 'image') {
-          image.src = nextItem.src;
-          image.classList.add('active');
+            // 🔹 Mostrar la siguiente imagen inmediatamente sin parpadeo
+            const nextItem = content[index + 1];
+            if (nextItem && nextItem.type === 'image') {
+                image.src = nextItem.src;
+                image.classList.add('active');
 
-          // 🔹 Solo avanza cuando el usuario haga clic
-          image.onclick = () => {
+                // 🔹 Esperar el clic para avanzar
+                image.onclick = () => {
+                    image.onclick = null;
+                    image.classList.remove('active');
+                    showContent(index + 1); // Avanza a la siguiente transición
+                };
+            } else {
+                showContent(index + 1); // Si no hay imagen, simplemente avanza
+            }
+        };
+    } else if (item.type === 'image') {
+        // 🔹 Mostrar la imagen sin que aparezca la anterior
+        image.src = item.src;
+        setTimeout(() => {
+            image.classList.add('active');
+        }, 50);
+
+        // 🔹 Esperar el clic para avanzar
+        image.onclick = () => {
             image.onclick = null;
             image.classList.remove('active');
-            showContent(index + 2); // Saltamos a la siguiente transición
-          };
-        }
-      };
-    } else if (item.type === 'image') {
-      // 🔹 Evitar que aparezca la imagen anterior antes de tiempo
-      setTimeout(() => {
-        image.src = item.src;
-        image.classList.add('active');
-      }, 50);
-
-      // 🔹 Esperar el clic para avanzar
-      image.onclick = () => {
-        image.onclick = null;
-        image.classList.remove('active');
-        showContent(index + 1);
-      };
+            showContent(index + 1);
+        };
     }
-  }
+}
 
   startScreen.onclick = () => {
     startScreen.classList.remove('active');
