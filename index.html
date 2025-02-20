@@ -182,6 +182,49 @@
       if (item.type === 'image' || item.type === 'Endimage') preloadImage(item.src);
     });
 
+    function showContent(index) {
+      if (index >= content.length) return;
+
+      currentIndex = index;
+      const item = content[index];
+
+      if (item.type === 'video') {
+        video.src = item.src;
+        video.classList.add('active');
+        video.oncanplay = () => {
+          video.play();
+        };
+
+        video.onended = () => {
+          setTimeout(() => {
+            video.classList.remove('active');
+            showContent(index + 1);
+          }, 300);
+        };
+      } else if (item.type === 'tempimage') {
+        image.src = item.src;
+        image.classList.add('active');
+        setTimeout(() => {
+          image.classList.remove('active');
+          showContent(index + 1);
+        }, 100);
+      } else if (item.type === 'image' || item.type === 'Endimage') {
+        image.src = item.src;
+        image.classList.add('active');
+
+        if (item.type === 'Endimage') {
+          startEndScreen();
+          return;
+        }
+
+        image.onclick = () => {
+          image.onclick = null;
+          image.classList.remove('active');
+          showContent(index + 1);
+        };
+      }
+    }
+
 
   // 🔹 Función para ir a la diapositiva anterior
   function goBack() {
@@ -250,67 +293,17 @@
   animate();
 }
 
-function showContent(index) {
-    if (index >= content.length) return;
+    startScreen.onclick = () => {
+      startScreen.classList.remove('active');
+      button.classList.remove("active");
+      document.body.style.cursor = 'none';
+      setTimeout(() => {
+        body.style.backgroundColor = '#ffffff';
+      }, 1500);
 
-    currentIndex = index;
-    const item = content[index];
-
-    // 🔹 OCULTAR TODAS LAS IMÁGENES ANTES DE MOSTRAR UNA NUEVA
-    image.classList.remove('active');
-    video.classList.remove('active');
-
-    if (item.type === 'video') {
-        video.src = item.src;
-        video.classList.add('active');
-
-        video.oncanplay = () => {
-            video.play();
-        };
-
-        video.onended = () => {
-            video.classList.remove('active');
-
-            // 🔹 Mostrar la siguiente imagen inmediatamente sin parpadeo
-            const nextItem = content[index + 1];
-            if (nextItem && nextItem.type === 'image') {
-                image.src = nextItem.src;
-                image.classList.add('active');
-
-                // 🔹 Esperar el clic para avanzar
-                image.onclick = () => {
-                    image.onclick = null;
-                    image.classList.remove('active');
-                    showContent(index + 1); // Avanza a la siguiente transición
-                };
-            } else {
-                showContent(index + 1); // Si no hay imagen, simplemente avanza
-            }
-        };
-    } else if (item.type === 'image') {
-        // 🔹 Mostrar la imagen sin que aparezca la anterior
-        image.src = item.src;
-        setTimeout(() => {
-            image.classList.add('active');
-        }, 50);
-
-        // 🔹 Esperar el clic para avanzar
-        image.onclick = () => {
-            image.onclick = null;
-            image.classList.remove('active');
-            showContent(index + 1);
-        };
-    }
-}
-
-  startScreen.onclick = () => {
-    startScreen.classList.remove('active');
-    document.body.style.cursor = 'none';
-    setTimeout(() => {
-      body.style.backgroundColor = '#ffffff';
       showContent(currentIndex);
-    }, 1500);
-  };
+    };
+
   </script>
 </body>
 </html>
