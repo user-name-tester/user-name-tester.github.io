@@ -183,38 +183,46 @@
     });
 
     function showContent(index) {
-  if (index >= content.length) return;
+    if (index >= content.length) return;
 
-  currentIndex = index;
-  const item = content[index];
+    currentIndex = index;
+    const item = content[index];
 
-  // 🔹 Ocultar cualquier imagen activa antes de mostrar nuevo contenido
-  image.classList.remove('active');
+    // 🔹 OCULTAR TODAS LAS IMÁGENES ANTES DE CAMBIAR A OTRA
+    image.classList.remove('active');
 
-  if (item.type === 'video') {
-    video.src = item.src;
-    video.classList.add('active');
+    if (item.type === 'video') {
+      video.src = item.src;
+      video.classList.add('active');
 
-    video.oncanplay = () => {
-      video.play();
-    };
+      video.oncanplay = () => {
+        video.play();
+      };
 
-    video.onended = () => {
-      video.classList.remove('active');
+      video.onended = () => {
+        video.classList.remove('active');
 
-      // 🔹 Asegurar que la imagen anterior no se vea antes de la nueva
-      setTimeout(() => {
+        // 🔹 Pequeño retraso para evitar que la imagen anterior parpadee
+        setTimeout(() => {
+          showContent(index + 1);
+        }, 50);
+      };
+
+    } else if (item.type === 'image') {
+      // 🔹 Asegurar que la imagen anterior está oculta antes de mostrar la nueva
+      setTimeout(() => { 
+        image.src = item.src;
+        image.classList.add('active');
+      }, 50);
+
+      // 🔹 Esperar un clic para avanzar
+      image.onclick = () => {
+        image.onclick = null;
+        image.classList.remove('active');
         showContent(index + 1);
-      }, 50); // Pequeño delay para hacer la transición suave
-    };
-
-  } else if (item.type === 'image') {
-    setTimeout(() => { 
-      image.src = item.src;
-      image.classList.add('active');
-    }, 50); // 🔹 Pequeño retraso para evitar el parpadeo
+      };
+    }
   }
-}
 
 
   // 🔹 Función para ir a la diapositiva anterior
