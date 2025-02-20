@@ -182,48 +182,6 @@
       if (item.type === 'image' || item.type === 'Endimage') preloadImage(item.src);
     });
 
-    function showContent(index) {
-    if (index >= content.length) return;
-
-    currentIndex = index;
-    const item = content[index];
-
-    // 🔹 OCULTAR TODAS LAS IMÁGENES ANTES DE CAMBIAR A OTRA
-    image.classList.remove('active');
-
-    if (item.type === 'video') {
-      video.src = item.src;
-      video.classList.add('active');
-
-      video.oncanplay = () => {
-        video.play();
-      };
-
-      video.onended = () => {
-        video.classList.remove('active');
-
-        // 🔹 Pequeño retraso para evitar que la imagen anterior parpadee
-        setTimeout(() => {
-          showContent(index + 1);
-        }, 50);
-      };
-
-    } else if (item.type === 'image') {
-      // 🔹 Asegurar que la imagen anterior está oculta antes de mostrar la nueva
-      setTimeout(() => { 
-        image.src = item.src;
-        image.classList.add('active');
-      }, 50);
-
-      // 🔹 Esperar un clic para avanzar
-      image.onclick = () => {
-        image.onclick = null;
-        image.classList.remove('active');
-        showContent(index + 1);
-      };
-    }
-  }
-
 
   // 🔹 Función para ir a la diapositiva anterior
   function goBack() {
@@ -292,17 +250,66 @@
   animate();
 }
 
-    startScreen.onclick = () => {
-      startScreen.classList.remove('active');
-      button.classList.remove("active");
-      document.body.style.cursor = 'none';
+// Logica de transiciones
+function showContent(index) {
+    if (index >= content.length) return;
+
+    currentIndex = index;
+    const item = content[index];
+
+    // 🔹 Asegurar que todas las imágenes están ocultas antes de mostrar una nueva
+    image.classList.remove('active');
+
+    if (item.type === 'video') {
+      // 🔹 Reproducir el video y asegurarnos de que la imagen no aparezca antes de tiempo
+      video.src = item.src;
+      video.classList.add('active');
+
+      video.oncanplay = () => {
+        video.play();
+      };
+
+      video.onended = () => {
+        video.classList.remove('active');
+
+        // 🔹 Al terminar el video, mostrar la siguiente imagen inmediatamente sin parpadeo
+        const nextItem = content[index + 1];
+        if (nextItem && nextItem.type === 'image') {
+          image.src = nextItem.src;
+          image.classList.add('active');
+
+          // 🔹 Solo avanza cuando el usuario haga clic
+          image.onclick = () => {
+            image.onclick = null;
+            image.classList.remove('active');
+            showContent(index + 2); // Saltamos a la siguiente transición
+          };
+        }
+      };
+    } else if (item.type === 'image') {
+      // 🔹 Evitar que aparezca la imagen anterior antes de tiempo
       setTimeout(() => {
-        body.style.backgroundColor = '#ffffff';
-      }, 1500);
+        image.src = item.src;
+        image.classList.add('active');
+      }, 50);
 
+      // 🔹 Esperar el clic para avanzar
+      image.onclick = () => {
+        image.onclick = null;
+        image.classList.remove('active');
+        showContent(index + 1);
+      };
+    }
+  }
+
+  startScreen.onclick = () => {
+    startScreen.classList.remove('active');
+    document.body.style.cursor = 'none';
+    setTimeout(() => {
+      body.style.backgroundColor = '#ffffff';
       showContent(currentIndex);
-    };
-
+    }, 1500);
+  };
   </script>
 </body>
 </html>
